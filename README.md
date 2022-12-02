@@ -42,6 +42,7 @@ Open a terminal and _cd_ to the project directory then write:
   conda env create -f environment.yml 
   conda activate database-schema-migration
 ```
+![img.png](images/database_migration_venv.png)
 ### Create a folder for each database and cd that folder, for example:
 ```bash
   mkdir demo_db
@@ -79,6 +80,31 @@ Modify the 'env.py':
 from base import DemoBase
 target_metadata = DemoBase.metadata
 ```
+To have the auto generated alembic script (alembic detects automatically the 
+difference between the model of the schema and the database), we need to import 
+the model and specify its metadata:
+-----
+env.py
+``` python
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+currentdir = currentdir + '/db_bases'
+sys.path.insert(0, currentdir)
+from base import Base
+target_metadata = Base.metadata
+```
+
+---
+base.py
+``` python
+import sys
+sys.path.insert(0, '/Users/badr/github_projects/common-codes')
+from databases_util.databases_schema.db_dbname_schema import *  
+```
+---
+Example of a model:
+
+![img.png](images/database_model_example.png)
+---
 * modify ```run_migrations_online``` by specifying:
 
 ``` python
@@ -95,14 +121,29 @@ connectable = engine_from_config(
 
 
 ### create revision
+If we want to create a revision without generating an automatic script:
 ```bash
   alembic revision -m "create test schema"
 ```
+If we want to auto generate the alembic script, we execute the following command:
+```bash
+  alembic revision --autogenerate -m "baseline"
+```
+The ```--autogenerate``` option will generate the following script with the upgrade and downgrade functions. 
+You need just to double-check the syntax and if there is something that is not detected automatically:
+
+![img.png](images/autogenerate_alembic_option.png)
+
+
 ### Modify file content
 
 Modify the file ```4cb84c335871_create_test_schema.py```: modify ```upgrade``` and ```downgrade``` by 
 adding your SQL statement.
 
+Before executing the following command, make sure you are 
+located in the same directory as the ```alembic.ini``` file.
+Check the alembic file content and make sure that the ```script_location```
+is indicating the right position of your revision file.
 ### alembic upgrades
 ```sh
     alembic upgrade head --sql
@@ -118,3 +159,11 @@ or
 ```
 
 ![img.png](images/alembic_downgrade_sh_execution.png)
+
+## Create a local database from an existing schema
+* First of all, you need to generate the model of the database using the ```sqlacodegen``` tool.
+* Second, create an alembic database migration project.
+* Third, create an empty schema using ```alembic revision -m 'create schema'```
+* Forth, using the model specify target_metadata to the Base of you model after importing it for sure.
+* Fifth, create a new revision using: ```alembic revision --autogenerate -m 'baseline'```
+* Finally, execute ```alembic upgrade head``` then the tables and all the dependencies will be created.

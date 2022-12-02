@@ -14,19 +14,23 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+# target_metadata = None
+
+
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 print(currentdir)
 currentdir = currentdir + '/db_bases'
 sys.path.insert(0, currentdir)
-from base import DemoBase
-target_metadata = DemoBase.metadata
+from base import Base
+target_metadata = Base.metadata
+
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -41,9 +45,9 @@ def get_url():
         parentdir = (os.path.dirname(currentdir))
         sys.path.insert(0, parentdir)
         import demo_db_config
-        print(f'Configuration file demo_db_config (test_schema) is successfully imported.')
+        print(f'Configuration file demo_db_config (npm_log) is successfully imported.')
     except Exception:
-        print(f'Configuration file demo_db_config NOT imported.')
+        print(f'Configuration file demo_db_config (npm_log) NOT imported.')
         pass
     user = os.getenv("DB_USER", "ml_user")
     password = quote(os.getenv("USER_PASSWORD", "1234"))
@@ -53,7 +57,7 @@ def get_url():
     return f"postgresql://{user}:{password}@{server}:{port}/{db}"
 
 
-def run_migrations_offline() -> None:
+def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -77,20 +81,22 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
+def run_migrations_online():
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
+    print(f'Starting online migration ...')
     configuration = config.get_section(config.config_ini_section)
+    print(f'ini configuration {configuration}')
     configuration["sqlalchemy.url"] = get_url()
+    print(f'After modification of ini configuration {configuration}')
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+        poolclass=pool.NullPool, )
 
     with connectable.connect() as connection:
         context.configure(
