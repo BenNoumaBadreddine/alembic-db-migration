@@ -170,5 +170,5 @@ or
 
 
 Resources:
-https://www.compose.com/articles/schema-migrations-with-alembic-python-and-postgresql/
-https://medium.com/pythonistas/managing-multiple-databases-migrations-with-alembic-10025a4b3ab3
+* https://www.compose.com/articles/schema-migrations-with-alembic-python-and-postgresql/
+* https://medium.com/pythonistas/managing-multiple-databases-migrations-with-alembic-10025a4b3ab3
