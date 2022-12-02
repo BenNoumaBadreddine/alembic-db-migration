@@ -167,3 +167,8 @@ or
 * Forth, using the model specify target_metadata to the Base of you model after importing it for sure.
 * Fifth, create a new revision using: ```alembic revision --autogenerate -m 'baseline'```
 * Finally, execute ```alembic upgrade head``` then the tables and all the dependencies will be created.
+
+
+Resources:
+https://www.compose.com/articles/schema-migrations-with-alembic-python-and-postgresql/
+https://medium.com/pythonistas/managing-multiple-databases-migrations-with-alembic-10025a4b3ab3
